@@ -26,6 +26,9 @@ mongoose
 
 const app = express();
 
+// Middleware to parse JSON request bodies
+app.use(express.json());
+
 // Middleware and routes
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
