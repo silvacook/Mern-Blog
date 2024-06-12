@@ -1,5 +1,5 @@
 import { Avatar, Button, Dropdown, Navbar, TextInput } from "flowbite-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
@@ -7,9 +7,15 @@ import { toggleTheme } from "../redux/theme/themeSlice";
 
 export default function Header() {
   const path = useLocation().pathname;
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
   const { theme } = useSelector((state) => state.theme);
+
+  const handleProfileClick = () => {
+    navigate("/dashboard?tab=profile");
+  };
+
   return (
     <Navbar className="border-b-2 dark:border-gray-700">
       <Link
@@ -39,7 +45,7 @@ export default function Header() {
           pill
           onClick={() => dispatch(toggleTheme())}
         >
-          {theme === 'light' ? <FaSun /> : <FaMoon />}
+          {theme === "light" ? <FaSun /> : <FaMoon />}
         </Button>
         {currentUser ? (
           <Dropdown
@@ -50,16 +56,23 @@ export default function Header() {
             }
           >
             <Dropdown.Header>
-              <span className="block text-sm dark:text-white">@{currentUser.username}</span>
+              <span className="block text-sm dark:text-white">
+                @{currentUser.username}
+              </span>
               <span className="block text-sm font-medium truncate dark:text-gray-400">
                 {currentUser.email}
               </span>
             </Dropdown.Header>
-            <Link to={"/dashboard?tab=profile"}>
-              <Dropdown.Item className="dark:text-white dark:hover:bg-gray-600">Profile</Dropdown.Item>
-            </Link>
+            <Dropdown.Item
+              onClick={handleProfileClick}
+              className="dark:text-white dark:hover:bg-gray-600"
+            >
+              Profile
+            </Dropdown.Item>
             <Dropdown.Divider className="dark:border-gray-600" />
-            <Dropdown.Item className="dark:text-white dark:hover:bg-gray-600">Sign out</Dropdown.Item>
+            <Dropdown.Item className="dark:text-white dark:hover:bg-gray-600">
+              Sign out
+            </Dropdown.Item>
           </Dropdown>
         ) : (
           <Link to="/sign-in">
@@ -71,13 +84,28 @@ export default function Header() {
         <Navbar.Toggle />
       </div>
       <Navbar.Collapse>
-        <Navbar.Link as={Link} to="/" active={path === "/"} className="dark:text-white">
+        <Navbar.Link
+          as={Link}
+          to="/"
+          active={path === "/"}
+          className="dark:text-white"
+        >
           Home
         </Navbar.Link>
-        <Navbar.Link as={Link} to="/about" active={path === "/about"} className="dark:text-white">
+        <Navbar.Link
+          as={Link}
+          to="/about"
+          active={path === "/about"}
+          className="dark:text-white"
+        >
           About
         </Navbar.Link>
-        <Navbar.Link as={Link} to="/projects" active={path === "/projects"} className="dark:text-white">
+        <Navbar.Link
+          as={Link}
+          to="/projects"
+          active={path === "/projects"}
+          className="dark:text-white"
+        >
           Projects
         </Navbar.Link>
       </Navbar.Collapse>
