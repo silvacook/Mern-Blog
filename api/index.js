@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
+import cookieParser from "cookie-parser";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -28,6 +29,7 @@ const app = express();
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
+app.use(cookieParser());
 
 // Middleware and routes
 app.use("/api/user", userRoutes);
