@@ -110,7 +110,7 @@ export default function CreatePost() {
               setFormData({ ...formData, category: e.target.value })
             }
           >
-            <option value="uncategorized">Select a category</option>
+            <option value="">Select a category</option>
             <option value="javascript">JavaScript</option>
             <option value="reactjs">React.js</option>
             <option value="nextjs">Next.js</option>
@@ -128,9 +128,9 @@ export default function CreatePost() {
             size="sm"
             outline
             onClick={handleUploadImage}
-            disabled={imageUploadProgress}
+            disabled={imageUploadProgress !== null}
           >
-            {imageUploadProgress ? (
+            {imageUploadProgress !== null ? (
               <div className="w-16 h-16">
                 <CircularProgressbar
                   value={imageUploadProgress}
@@ -146,7 +146,7 @@ export default function CreatePost() {
         {formData.image && (
           <img
             src={formData.image}
-            alt="upload"
+            alt="Uploaded Preview"
             className="w-full h-72 object-cover"
           />
         )}
