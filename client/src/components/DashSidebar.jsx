@@ -1,10 +1,9 @@
 import { Sidebar } from "flowbite-react";
-import { HiArrowSmRight, HiDocumentText, HiUser } from "react-icons/hi";
+import { HiArrowSmRight, HiDocumentText, HiOutlineUserGroup, HiUser } from "react-icons/hi";
 import { useEffect, useState } from "react";
-import { useLocation, Link } from "react-router-dom"; // Import Link from react-router-dom
+import { useLocation, Link } from "react-router-dom";
 import { signoutSuccess } from "../redux/user/userSlice";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function DashSidebar() {
   const location = useLocation();
@@ -41,31 +40,41 @@ export default function DashSidebar() {
       <Sidebar.Items>
         <Sidebar.ItemGroup className="flex flex-col gap-1">
           <Sidebar.Item
-            as={Link} // Use Link component here
+            as={Link}
             to="/dashboard?tab=profile"
             active={tab === "profile"}
             icon={HiUser}
-            label={currentUser.isAdmin ? 'Admin' : 'User'}
+            label={currentUser.isAdmin ? "Admin" : "User"}
             labelColor="dark"
           >
             Profile
           </Sidebar.Item>
           {currentUser.isAdmin && (
-            <Sidebar.Item
-              as={Link} // Use Link component here
-              to="/dashboard?tab=posts"
-              active={tab === "posts"}
-              icon={HiDocumentText}
-            >
-              Posts
-            </Sidebar.Item>
+            <>
+              <Sidebar.Item
+                as={Link}
+                to="/dashboard?tab=posts"
+                active={tab === "posts"}
+                icon={HiDocumentText}
+              >
+                Posts
+              </Sidebar.Item>
+              <Sidebar.Item
+                as={Link}
+                to="/dashboard?tab=users"
+                active={tab === "users"}
+                icon={HiOutlineUserGroup}
+              >
+                Users
+              </Sidebar.Item>
+            </>
           )}
           <Sidebar.Item
             icon={HiArrowSmRight}
             className="cursor-pointer"
             onClick={handleSignout}
           >
-            <Link to="/">Sign Out</Link> {/* Wrap in Link tag */}
+            <Link to="/">Sign Out</Link>
           </Sidebar.Item>
         </Sidebar.ItemGroup>
       </Sidebar.Items>
