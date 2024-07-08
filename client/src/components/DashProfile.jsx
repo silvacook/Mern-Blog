@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Alert, Button, Modal, TextInput } from "flowbite-react";
-import { useSelector, useDispatch } from "react-redux";
+import { Alert, Button, Modal, ModalBody, TextInput } from "flowbite-react";
+import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import {
   getDownloadURL,
   getStorage,
@@ -19,6 +19,7 @@ import {
   deleteUserFailure,
   signoutSuccess,
 } from "../redux/user/userSlice";
+import { useDispatch } from "react-redux";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Link } from "react-router-dom";
 
@@ -26,16 +27,15 @@ export default function DashProfile() {
   const { currentUser, error, loading } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
+  const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
+  const [imageFileUploadError, setImageFileUploadError] = useState(null);
   const [imageFileUploading, setImageFileUploading] = useState(false);
   const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [imageFileUploadedProgress, setImageUploadedProgress] = useState(null);
-  const [imageFileUploadFailure, setImageFileUploadFailure] = useState(null);
   const [updateUserError, setUpdateUserError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({});
   const filePickerRef = useRef();
   const dispatch = useDispatch();
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -43,7 +43,6 @@ export default function DashProfile() {
       setImageFileUrl(URL.createObjectURL(file));
     }
   };
-
   useEffect(() => {
     if (imageFile) {
       uploadImage();
@@ -51,28 +50,37 @@ export default function DashProfile() {
   }, [imageFile]);
 
   const uploadImage = async () => {
+    // service firebase.storage {
+    //   match /b/{bucket}/o {
+    //     match /{allPaths=**} {
+    //       allow read;
+    //       allow write: if
+    //       request.resource.size < 2 * 1024 * 1024 &&
+    //       request.resource.contentType.matches('image/.*')
+    //     }
+    //   }
+    // }
     setImageFileUploading(true);
-    setImageFileUploadFailure(null);
+    setImageFileUploadError(null);
     const storage = getStorage(app);
     const fileName = new Date().getTime() + imageFile.name;
     const storageRef = ref(storage, fileName);
     const uploadTask = uploadBytesResumable(storageRef, imageFile);
-
     uploadTask.on(
       "state_changed",
       (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setImageUploadedProgress(progress.toFixed(0));
+
+        setImageFileUploadProgress(progress.toFixed(0));
       },
       (error) => {
-        setImageFileUploadFailure(
-          "Could not upload image (file must be less than 2MB)"
+        setImageFileUploadError(
+          "Could not upload image (File must be less than 2MB)"
         );
-        setImageUploadedProgress(null);
+        setImageFileUploadProgress(null);
         setImageFile(null);
         setImageFileUrl(null);
-        s;
         setImageFileUploading(false);
       },
       () => {
@@ -123,7 +131,6 @@ export default function DashProfile() {
       setUpdateUserError(error.message);
     }
   };
-
   const handleDeleteUser = async () => {
     setShowModal(false);
     try {
@@ -157,7 +164,6 @@ export default function DashProfile() {
       console.log(error.message);
     }
   };
-
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
@@ -173,10 +179,10 @@ export default function DashProfile() {
           className="relative w-32 h-32 self-center cursor-pointer shadow-md overflow-hidden rounded-full"
           onClick={() => filePickerRef.current.click()}
         >
-          {imageFileUploadedProgress && (
+          {imageFileUploadProgress && (
             <CircularProgressbar
-              value={imageFileUploadedProgress || 0}
-              text={`${imageFileUploadedProgress}%`}
+              value={imageFileUploadProgress || 0}
+              text={`${imageFileUploadProgress}%`}
               strokeWidth={5}
               styles={{
                 root: {
@@ -188,7 +194,7 @@ export default function DashProfile() {
                 },
                 path: {
                   stroke: `rgba(62, 152, 199, ${
-                    imageFileUploadedProgress / 100
+                    imageFileUploadProgress / 100
                   })`,
                 },
               }}
@@ -198,16 +204,14 @@ export default function DashProfile() {
             src={imageFileUrl || currentUser.profilePicture}
             alt="user"
             className={`rounded-full w-full h-full object-cover border-8 border-[lightgray] ${
-              imageFileUploadedProgress &&
-              imageFileUploadedProgress < 100 &&
+              imageFileUploadProgress &&
+              imageFileUploadProgress < 100 &&
               "opacity-60"
             }`}
-            style={{ objectFit: "cover", width: "100%", height: "100%" }}
           />
         </div>
-
-        {imageFileUploadFailure && (
-          <Alert color="failure">{imageFileUploadFailure}</Alert>
+        {imageFileUploadError && (
+          <Alert color="failure">{imageFileUploadError}</Alert>
         )}
         <TextInput
           type="text"
@@ -235,7 +239,7 @@ export default function DashProfile() {
           outline
           disabled={loading || imageFileUploading}
         >
-          {loading ? 'Loading....' : 'Update' }
+          {loading ? "Loading..." : "Update"}
         </Button>
         {currentUser.isAdmin && (
           <Link to={"/create-post"}>
@@ -283,11 +287,11 @@ export default function DashProfile() {
           <div className="text-center">
             <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
             <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
-              Are you sure you want to delete your account
+              Are you sure you want to delete your account?
             </h3>
             <div className="flex justify-center gap-4">
               <Button color="failure" onClick={handleDeleteUser}>
-                Yes I'm sure
+                Yes, I'm sure
               </Button>
               <Button color="gray" onClick={() => setShowModal(false)}>
                 No, cancel

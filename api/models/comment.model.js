@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 const commentSchema = new mongoose.Schema(
   {
     content: {
-      // Corrected field name
       type: String,
       required: true,
     },
