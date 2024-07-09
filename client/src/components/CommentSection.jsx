@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Textarea } from "flowbite-react";
+import { Button, Textarea, Alert } from "flowbite-react";
 import Comment from "./Comment";
 
 export default function CommentSection({ postId }) {
@@ -65,27 +65,37 @@ export default function CommentSection({ postId }) {
   const handleLike = async (commentId) => {
     try {
       if (!currentUser) {
-        navigate('/sign-in');
+        navigate("/sign-in");
         return;
       }
       const res = await fetch(`/api/comment/likeComment/${commentId}`, {
-        method: 'PUT',
+        method: "PUT",
       });
       if (res.ok) {
         const data = await res.json();
-        setComments(comments.map((comment) =>
-          comment._id === commentId
-            ? {
-                ...comment,
-                likes: data.likes,
-                numberOfLikes: data.likes.length,
-              }
-            : comment
-        ));
+        setComments(
+          comments.map((comment) =>
+            comment._id === commentId
+              ? {
+                  ...comment,
+                  likes: data.likes,
+                  numberOfLikes: data.likes.length,
+                }
+              : comment
+          )
+        );
       }
     } catch (error) {
       console.log(error.message);
     }
+  };
+
+  const handleEdit = (comment, editedContent) => {
+    setComments(
+      comments.map((c) =>
+        c._id === comment._id ? { ...c, content: editedContent } : c
+      )
+    );
   };
 
   return (
@@ -155,10 +165,7 @@ export default function CommentSection({ postId }) {
               key={comment._id}
               comment={comment}
               onLike={handleLike}
-              onDelete={(commentId) => {
-                setShowModal(true);
-                setCommentToDelete(commentId);
-              }}
+              onEdit={handleEdit}
             />
           ))}
         </>
