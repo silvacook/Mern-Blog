@@ -87,6 +87,8 @@ export const editComment = async (req, res, next) => {
       );
     }
 
+    await Comment.findByIdAndDelete(req.params.commentId);
+    res.status(200).json('Comment has been deleted');
     const editedComment = await Comment.findByIdAndUpdate(
       req.params.commentId,
       {
