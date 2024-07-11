@@ -11,7 +11,6 @@ export default function PostPage() {
   const [error, setError] = useState(false);
   const [post, setPost] = useState(null);
   const [recentPosts, setRecentPosts] = useState(null);
-  const [loadingRecentPosts, setLoadingRecentPosts] = useState(true); // Added loading state for recent posts
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -38,30 +37,26 @@ export default function PostPage() {
   }, [postSlug]);
 
   useEffect(() => {
-    const fetchRecentPosts = async () => {
-      try {
+    try {
+      const fetchRecentPosts = async () => {
         const res = await fetch(`/api/post/getposts?limit=3`);
-        const data = await res.json(); // Await the json() method to get the parsed data
-
+        const data = await res.json();
         if (res.ok) {
           setRecentPosts(data.posts);
-          setLoadingRecentPosts(false); // Update loading state for recent posts
         }
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
-    fetchRecentPosts();
+      };
+      fetchRecentPosts();
+    } catch (error) {
+      console.log(error.message);
+    }
   }, []);
 
-  if (loading || loadingRecentPosts)
-    // Consider loadingRecentPosts in the condition
+  if (loading)
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Spinner size="xl" />
       </div>
     );
-
   return (
     <main className="p-3 flex flex-col max-w-6xl mx-auto min-h-screen">
       <h1 className="text-3xl mt-10 p-3 text-center font-serif max-w-2xl mx-auto lg:text-4xl">
@@ -89,7 +84,7 @@ export default function PostPage() {
       <div
         className="p-3 max-w-2xl mx-auto w-full post-content"
         dangerouslySetInnerHTML={{ __html: post && post.content }}
-      />
+      ></div>
       <div className="max-w-4xl mx-auto w-full">
         <CallToAction />
       </div>
